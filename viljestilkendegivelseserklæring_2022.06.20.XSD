@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+           xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+           xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+<xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
+		       schemaLocation="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"/>
+
+
+	<xs:element name="Adgangspolitik" type="AdgangspolitikType"/>
+	<xs:complexType name="AdgangspolitikType">
+		<xs:annotation>
+			<xs:documentation>
+            Et viljestilkendegivelsesobjekt indeholder en adgangspolitik for viljestilkendegivelsen i form af hvilke sikkerhedsgrupper, der må udføre hvilke operationer - eksempel læse eller opdatere viljestilknedegivelsen. Dette svarer konceptuelt til en adgangskontrolliste (ACL) på en ressource i et filsystem.
+	          Elementet understøtter en fødereret sikkerhedsmodel, hvor medlemskab af sikkerhedsgrupper kan administreres uden for viljestilknedegivelsesobjekterne.
+	          Det er viljestilkendegivelsesaktøren, der skaber viljestilkendegivelsesobjektet, der skal definere adgangspolitikken for en given viljestilkendegivelse, herunder hvilke grupper som har hvilke tilladelser (rettigheder).
+      </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Gruppe" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Tilladelse" type="TilladelseType" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="TilladelseType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="laes"/>
+			<xs:enumeration value="tilbagekald"/>
+			<xs:enumeration value="opret"/>
+			<xs:enumeration value="opdater"/>
+			<xs:enumeration value="opdater_attestation"/>
+			<xs:enumeration value="opdater_body"/>
+			<xs:enumeration value="opdater_header"/>
+      <xs:enumeration value="opdater_signatur"/>
+			<xs:enumeration value="slet"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="Attestation" type="AttestationType"/>
+	<xs:complexType name="AttestationType">
+		<xs:annotation>
+			<xs:documentation>Hvis der er flere viljestilkendegivere oprettes een viljestilkendegivelseserklæring per viljestilkendegiver.
+	Logikken om hvad der skal til for at man må foretage en handling baseret på et eller flere viljestilkendegivelser administreres lokalt. Det vil sige, at hvis det f.eks. kræves at begge forældre giver deres samtykke for at en organisation må udføre en handling på et barn, vil den fælles infrastruktur kunne levere information om status på de enkelte viljestilkendegivelseserklæringer og underliggende viljestilkendegivelsespakker, men det er organisationens ansvar at tolke den information - at begge nødvendige samtykker er givet for at kunne udføre den ønskede handling.
+	En attestation kan i tillæg til viljestilkendegivers viljestilkendegivelse være afhængig af, at det registreres af en medarbejder eller hvis det er indgået i et andet system, kan der laves en attest i form af et systembevis. I disse tilfælde vil viljestilkendegiver stadig stå som attestator, men attestationsformatet vil være enten medarbejderattest eller systembevis. Information om det specifikke system eller medarbejder er indlejret i attestationselementet men de anses ikke for værende viljestilkendegivelsesaktører.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Format" type="AttestationsformatType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Underskriftstidspunkt" type="xsd:dateTime" minOccurs="1" maxOccurs="1">
+			  <xs:annotation>
+				<xs:documentation>Underskriftstidspunkt er lig med genereringstidspunkt for signaturen</xs:documentation>
+			  </xs:annotation>
+			</xs:element>
+			
+			<xs:element name="ViljestilkendegiverID" type="xsd:anyURI" minOccurs="1" maxOccurs="1">
+			  <xs:annotation>
+				<xs:documentation>ID på den viljestilkendegivelsesaktør som har afgivet viljestilkendegivelse</xs:documentation>
+			  </xs:annotation>
+			</xs:element>
+			
+			<xs:choice>
+				<xs:element name="Systembevis" type="xsd:string" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Anvendes fx når it-system har indhentet accept i brugerflade ved klik på knap etc. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="DigitalSignatur" type="xsd:string" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Digital underskrift fra viljestilkendegiver eller medarbejderattestator. Dette element er tomt hvis der er tale om en PDF med en analog underskrift eller et systembevis</xs:documentation>
+					</xs:annotation>
+				</xs:element>		
+					<xs:element name="MedarbejderAttestator" type="xsd:anyURI" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Angives kun hvis det er en medarbejder, der attesterer (signerer) på vegne af en borger. Der angives ID på den medarbejder som afgiver digital signatur. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+						<xs:element name="Rekvireringsmetode" type="RekvireringsmetodeType" minOccurs="1" maxOccurs="1"/>
+			</xs:choice>
+		
+		<!--  OBS: Skema burde anvende nedenstående definition i stedet, men det skal først afklares skemateknisk.
+		<xs:element name="Signaturelement" type="ds:Signature" minOccurs="0" maxOccurs="1">
+		  <xs:annotation>
+			<xs:documentation>Dette element er tomt hvis der er tale om en analog signatur eller en PDF med en analog underskrift</xs:documentation>
+		  </xs:annotation>
+		</xs:element> -->
+		</xs:sequence>
+	</xs:complexType>	
+
+	<xs:simpleType name="AttestationsformatType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="digital_signatur">
+				<xs:annotation>
+					<xs:documentation>Digital signatur af viljestilkendegiver eller medarbejdsattestator fx med NemID eller MitID</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="analog_signatur">
+				<xs:annotation>
+					<xs:documentation>Anvendes kun når body indeholder en PDF som er underskrevet analogt (med kuglepen)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="systembevis">
+				<xs:annotation>
+					<xs:documentation>Anvendes når der f.eks. indgås et samtykke i et system, og hvor der ikke anvendes digital signatur. I disse tilfælde kan systemet levere et systembevis, som indestår for at samtykket er indgået af en specifik person på et givent tidspunkt.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="Bemyndigelse" type="BemyndigelseType"/>
+	<xs:complexType name="BemyndigelseType">
+		<xs:annotation>
+			<xs:documentation>Bemyndigelsestype skal kun angives, hvis attestator er en aktør med rollen "stedfortrædende viljestilkendegiver", da den henviser til hvilken adkomst den stedfortrædende viljestilkendegiver har til at indgå viljestilkendegivelsen på vegne af viljestilkendegivelsessubjekt</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Bemyndigelsestype" type="BemyndigelsesType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="BemyndigelsesType">
+		<xs:annotation>
+			<xs:documentation>BemyndigelsesType angiver den adkomst den stedfortrædende viljestilkendegiver har til at afgive viljestilkendegivelse på vegne af viljestilkendegivelsessubjektet. Det kan f.eks. være fordi de har en fuldmagt og derved er fuldmagtshaver</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="foraeldremyndighedsindehaver"/>
+			<xs:enumeration value="vaerge"/>
+			<xs:enumeration value="fuldmagtshaver"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="Body" type="BodyType"/>
+	<xs:complexType name="BodyType">
+		<xs:sequence>
+      	<xs:element name="Maskinlaesbartindhold" type="xsd:anyType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="DokumentFormatType">
+		<xs:annotation>
+			<xs:documentation>I datamodellen hedder viljestilkendegivelsesdokumentformat blot "dokumentformat". DokumentformatType skal anvendes af det system, som skal læse BODY ,til at vide hvilken type objekt, der fremgår</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="struktureret_data"/>
+			<xs:enumeration value="pdf"/>
+			<xs:enumeration value="tekst"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="DokumentstatusType">
+		<xs:annotation>
+			<xs:documentation>vær opmærksom på at enumerationen kan anvendes bredere end for viljestilkendegivelse, men at den vejledende tekst tager udgangspunkt i at den anvendes i regi af viljestilkendegivelse. Et dokument kan have 8 forskellige statusser, herunder
+			1) "oprettet", som dækker over et hvert viljestilkendegivelse som er oprettet i det delte lager, men som ikke klar til at blive sendt til signering
+			2) "afventer signering" som er et viljestilkendegivelse er sendt til signering til en eller flere viljestilkendegivere, og er endnu ikke signeret. Signatur komponenten vil kun fungere på viljestilkendegivelser med denne status
+			3) "gaeldende" som er status på viljestilkendegivelse, når viljestilkendegiver har attesteret viljestilkendegivelsen. Status addresserer ikke hvorvidt viljestilkendegivelsen er juridisk gyldigt, da det er op til den ansvarlige viljestilkendegivelseforretningsansvarlig at sikre.
+			4) "afvist", som er når viljestilkendegiver har afvist at signere viljestilkendegivelsen
+			5) "erstattet" som er status når viljestilkendegivelsen er blevet erstattet af et nyt viljestilkendegivelse, f.eks. ved opdatering af gyldighedsperiode
+			6) "tilbagekaldt" er når viljestilkendegiver har tilbagekaldt viljestilkendegivelsen
+			7) "udloebet" er når viljestilkendegivelsens gyldighedsperiode er udløbet og derfor ikke længere gyldigt. Det er forretningssystemets ansvar at opdatere status fra gyldig til udløbet
+			8) "lukket" viljestilkendegivelsen er lukket af et forretningssystem da der ikke lænrere er behov for viljestilkendegivelse</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="oprettet"/>
+			<xs:enumeration value="afventer signering"/>
+			<xs:enumeration value="gaeldende"/>
+			<xs:enumeration value="afvist"/>
+			<xs:enumeration value="tilbagekaldt"/>
+			<xs:enumeration value="udloebet"/>
+			<xs:enumeration value="lukket"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="ErklaeringBody" type="ErklaeringBodyType"/>
+	<xs:complexType name="ErklaeringBodyType">
+		<xs:sequence>
+			<xs:element name="ID" type="xsd:anyURI" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Format" type="DokumentFormatType" minOccurs="1" maxOccurs="1"/>
+			<xs:choice>
+				<xs:element name="DokumentFil" type="xsd:base64Binary" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="Tekst" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="StruktureretData" type="xsd:anyType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="Stylesheet" type="xsd:anyURI" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="BrugervendtPraesentation" type="xsd:base64Binary" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Her gemmes det objekt, som er præsenteret for brugeren ved indgåelse af viljestilkendegivelsen.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="ErklaeringHeader" type="ErklaeringHeaderType"/>
+	<xs:complexType name="ErklaeringHeaderType">
+		<xs:sequence>
+			<xs:element name="Erklaeringsskabelon" type="xsd:anyURI" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Adgangspolitik" type="AdgangspolitikType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="Administrator" type="ViljestilkendegivelsesadministratorType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="Aktoer" type="ViljestilkendegivelsesaktoerType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="Domaenekontekst" type="ViljestilkendegivelsesdomaenekontekstType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Erklaeringsmetadata" type="ViljestilkendegivelseserklaeringsmetadataType" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="FormelOrganisation" type="FormelOrganisationType"/>
+	<xs:complexType name="FormelOrganisationType">
+		<xs:sequence>
+			<xs:element name="Identifikator" type="IdentifikatorType" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Forvaltningshandling" type="ForvaltningshandlingType"/>
+	<xs:complexType name="ForvaltningshandlingType">
+		<xs:sequence>
+			<xs:element name="ForetrukkenTerm" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Notation" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Identifikator" type="IdentifikatorType" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Forvaltningsopgave" type="ForvaltningsopgaveType"/>
+	<xs:complexType name="ForvaltningsopgaveType">
+		<xs:sequence>
+			<xs:element name="ForetrukkenTerm" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Identifikator" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Notation" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Header" type="HeaderType"/>
+	<xs:complexType name="HeaderType">
+		<xs:sequence>
+			<xs:element name="Viljestilkendegivelsesskabelon" type="xsd:anyURI" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Adgangspolitik" type="AdgangspolitikType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Viljestilkendegivelsesmetadata" type="ViljestilkendegivelsesmetadataType" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Identifikator" type="IdentifikatorType"/>
+	<xs:complexType name="IdentifikatorType">
+		<xs:sequence>
+			<xs:element name="Vaerdi" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Klassifikation" type="xsd:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Identifikatoren kan vedrøre alle typer af entiteter der skal kunne identificeres entydigt så som begreber, personer, organisationer, organisationsenheder, medarbejdere osv.
+Dette felt henviser til navnet på den klassifikation som identifikatoren stammer fra. Det kan f.eks. være FORM, KLE, CPR, CVR, SOR mv.
+Navnet skal inkludere versionsnummer hvis et sådant anvendes.
+Eksempelvis: FORM-Online Opgavenøglen 2.19 eller KLE Online Marts 2022</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Kontekst" type="xsd:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Kontekst er et ID, som kun udfyldes hvis der er behov for den, for at kunne anvende identifikatoren. Det kan f.eks. i tilfælde af et erstatnings cpr-nr være angivelse af den organisation som har udstedt det. I tilfælde af en sag, kan det være det IT system som identifikator værdien er tilknyttet.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Organisationsmedlem" type="OrganisationsmedlemType"/>
+	<xs:complexType name="OrganisationsmedlemType">
+		<xs:sequence>
+			<xs:element name="Navn" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="MedlemAf" type="FormelOrganisationType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Identifikator" type="IdentifikatorType" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Person" type="PersonType"/>
+	<xs:complexType name="PersonType">
+		<xs:annotation>
+			<xs:documentation></xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Navn" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Identifikator" type="IdentifikatorType" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="RekvireringsmetodeType">
+		<xs:annotation>
+			<xs:documentation>Rekvireringsmetode specificerer, hvordan viljestilkendegivelsen er indhentet. Det skal kunne vises til borgeren i en detaljevisning for viljestilkendegivelsen</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="telefonisk_dialog"/>
+			<xs:enumeration value="personlig_dialog"/>
+			<xs:enumeration value="faglig_vurdering"/>
+			<xs:enumeration value="non-verbal_tilkendegivelse"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="SagsOgBehandlingskontekst" type="SagsOgBehandlingskontekstType"/>
+	<xs:complexType name="SagsOgBehandlingskontekstType">
+		<xs:annotation>
+			<xs:documentation>Hvis det ønskes at henvise til en sag efter viljestilkendegivelsen er oprettet, er det den dataansvarlige viljestilkendegivelsesaktør, som skal sørge for at tilladelse til dette tildeles</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Titel" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Identifikator" type="IdentifikatorType" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Viljestilkendegivelse" type="ViljestilkendegivelseType"/>
+	<xs:complexType name="ViljestilkendegivelseType">
+		<xs:sequence>
+			<xs:element name="ID" type="xsd:anyURI" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Header" type="HeaderType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Body" type="BodyType" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Viljestilkendegivelsesadministrator" type="ViljestilkendegivelsesadministratorType"/>
+	<xs:complexType name="ViljestilkendegivelsesadministratorType">
+		<xs:sequence>
+			<xs:element name="Administratorrolle" type="ViljestilkendegivelsesadministratorrolleType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Organisation" type="FormelOrganisationType" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="ViljestilkendegivelsesadministratorrolleType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="forretningsansvarlig">
+				<xs:annotation>
+					<xs:documentation>Myndighed, som er ansvarlig for at viljestilkendegivelsen er lovmedholdelig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="rettighedstildeler">
+				<xs:annotation>
+					<xs:documentation>Myndighed, som er ansvarlig for at tildele rettigheder for til de rette viljestilkendegivelsesanvendere ved viljestilkendegivelsens oprettelse</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="Viljestilkendegivelsesaktoer" type="ViljestilkendegivelsesaktoerType"/>
+	<xs:complexType name="ViljestilkendegivelsesaktoerType">
+		<xs:annotation>
+			<xs:documentation>Viljestilkendegivelsesaktoer arver attributter fra enten formel organisation, organisationsmedlem eller person</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ID" type="xsd:anyURI" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="PaakraevetSignatur" type="xsd:boolean" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Her angives det om samtykkesubjekt eller stedfortrædende viljestilkendegiver skal attestere digitalt. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Aktoerrolle" type="ViljestilkendegivelsesaktoerrolleType" minOccurs="1" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>En organisation skal både kunne være viljestlikendegivelsesrekvirent og viljestilkendegivelsesbruger</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="Organisation" type="FormelOrganisationType" minOccurs="0" maxOccurs="1"/>    
+				<xs:element name="Organisationsmedlem" type="OrganisationsmedlemType" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="Person" type="PersonType" minOccurs="0" maxOccurs="1"/>
+			</xs:choice>
+	 		<xs:element name="AttestererPaaVegneAf" type="ViljestilkendegivelsesaktoerType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="ViljestilkendegivelsesaktoerrolleType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="viljestilkendegivelsessubjekt">
+				<xs:annotation>
+					<xs:documentation>En aktør af type person skal registreres som viljestilkendegivelsessubjekt hvis viljestilkendegivelsen omhandler dem. De kan enten selv være viljestilkendegiver eller en stedfortrædende viljestilkendegiver kan afgive viljestilkendegivelse på vegne af dem</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="viljetilkendegivelsesrekvirent">
+				<xs:annotation>
+					<xs:documentation>Organisation eller person, som opretter og afsender anmodning om viljestilkendegivelse</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="stedfortraedende_viljestilkendegiver">
+				<xs:annotation>
+					<xs:documentation>En aktør skal registreres som stedfortrædende viljestilkendegiver hvis vedkommende skal afgive viljestilkendegivelse på vegne af viljestilkendegivelsessubjekt. Det kan f.eks. være hvis de har fuldmagt til at agere på viljestilkendegivelsessubjektets vegne. Dette kan være i regi af en familierelation men det kan også være i regi af den stedfortrædende viljestilkendegivers virke, som f.eks. advokat. Således kan denne aktørtype være en person eller en organisationsmedlem eller evt en organisation, hvis der er flere mulige organisationsmedlemmer som kan varetage rollen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="Viljestilkendegivelsesdomaenekontekst" type="ViljestilkendegivelsesdomaenekontekstType"/>
+	<xs:complexType name="ViljestilkendegivelsesdomaenekontekstType">
+		<xs:sequence>
+	<!--	<xs:element name="BorgervendtVisningsdata" type="xsd:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>dette element er pt en placeholder for den information der skal tilføjes til visning i overblik til borgeren. Det kan f.eks. være kontaktoplysninger på den organiation som viljestilkendegivelsen er indgået med samt link til selvbetjeningsløsning</xs:documentation>
+				</xs:annotation>
+			</xs:element>	-->
+			<xs:element name="LokalKontekst" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Berigende information om organisationsspecifik kontekst til viljestilkendegivelse som den lokale infrastruktur skal kunne tolke
+                    Lokalkontekst er teknisk set et fritekstfelt, som f.eks. kan anvendes til en tekststreng eller et xml dokument. Man kan således indføre strukturerert data, som anvendes af lokal infrastruktur, af de som har brug for det hvor data ikke er en del af standarden.
+                    Hvis det f.eks.  er et xml dokument man vil indføre, kan man vælge at pege på det ved anyURI.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Forvaltningshandling" type="ForvaltningshandlingType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Forvaltningsopgave" type="ForvaltningsopgaveType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Sagskontekst" type="SagsOgBehandlingskontekstType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Viljestilkendegivelseserklaering" type="ViljestilkendegivelseserklaeringType"/>
+	<xs:complexType name="ViljestilkendegivelseserklaeringType">
+		<xs:sequence>
+			<xs:element name="ID" type="xsd:anyURI" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Attestation" type="AttestationType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="ErklaeringHeader" type="ErklaeringHeaderType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="ErklaeringBody" type="ErklaeringBodyType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Viljestilkendegivelse" type="ViljestilkendegivelseType" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Viljestilkendegivelseserklaeringsmetadata" type="ViljestilkendegivelseserklaeringsmetadataType"/>
+	<xs:complexType name="ViljestilkendegivelseserklaeringsmetadataType">
+		<xs:sequence>
+			<xs:element name="Status" type="DokumentstatusType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Titel" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="GaeldendeFra" type="xsd:dateTime" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Viljestilkendegivelseserklæringen er gældende fra attesteringstidspunktet. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GaeldendeTil" type="xsd:dateTime" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>GældendeTil skal kun udfyldes hvis der er angivet et udløbstidspunkt. Hvis Erklæringen tilbagekaldes eller lukkes angives GældendeTil som tidsstempel for dette. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Erstatter" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="ErstattetAf" type="xsd:anyURI" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Noegleord" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Nøgleord for viljestilkendegivelsen som er fra lokal eller fælles datamodel eller klassifikation med kontrolleret udfaldsrum. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="Viljestilkendegivelsesmetadata" type="ViljestilkendegivelsesmetadataType"/>
+	<xs:complexType name="ViljestilkendegivelsesmetadataType">
+		<xs:annotation>
+			<xs:documentation>Under implementering kan viljestilkendegivleser grupperes, hvis metadata er ens. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Status" type="ViljestilkendegivelsesstatusType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Titel" type="xsd:string" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Sigende titel til viljestilkendegivelsesen. Titlen skal kunne anvendes i overbliksvisning for borger eller medarbejder.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ErstattetAf" type="xsd:anyURI" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="GaeldendeFra" type="xsd:dateTime" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Viljestilkendegivelsen træder typisk i kraft ved attesteringstidspunktet.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GaeldendeTil" type="xsd:dateTime" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>GældendeTil skal kun udfyldes hvis der er angivet et udløbstidspunkt. Hvis Viljestilkendegivelsen tilbagekaldes eller lukkes angives GældendeTil som tidsstempel for dette.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Noegleord" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Nøgleord for viljestilkendegivelsen, som er fra lokal eller fælles datamodel eller klassifikation med kontrolleret udfaldsrum. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Viljestilkendegivelsestype" type="ViljestilkendegivelsesType" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="ViljestilkendegivelsesstatusType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="oprettet"/>
+			<xs:enumeration value="gaeldende"/>
+			<xs:enumeration value="afvist"/>
+			<xs:enumeration value="tilbagekaldt"/>
+			<xs:enumeration value="udloebet"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ViljestilkendegivelsesType">
+		<xs:annotation>
+			<xs:documentation>Type af viljestilkendegivelse</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="frabedelse"/>
+			<xs:enumeration value="samtykke"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
