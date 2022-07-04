@@ -39,54 +39,54 @@
 		</xs:restriction>
 	</xs:simpleType>
 
-	<xs:element name="Attestation" type="AttestationType"/>
-	<xs:complexType name="AttestationType">
-		<xs:annotation>
-			<xs:documentation>Hvis der er flere viljestilkendegivere oprettes een viljestilkendegivelseserklæring per viljestilkendegiver.
-	Logikken om hvad der skal til for at man må foretage en handling baseret på et eller flere viljestilkendegivelser administreres lokalt. Det vil sige, at hvis det f.eks. kræves at begge forældre giver deres samtykke for at en organisation må udføre en handling på et barn, vil den fælles infrastruktur kunne levere information om status på de enkelte viljestilkendegivelseserklæringer og underliggende viljestilkendegivelsespakker, men det er organisationens ansvar at tolke den information - at begge nødvendige samtykker er givet for at kunne udføre den ønskede handling.
-	En attestation kan i tillæg til viljestilkendegivers viljestilkendegivelse være afhængig af, at det registreres af en medarbejder eller hvis det er indgået i et andet system, kan der laves en attest i form af et systembevis. I disse tilfælde vil viljestilkendegiver stadig stå som attestator, men attestationsformatet vil være enten medarbejderattest eller systembevis. Information om det specifikke system eller medarbejder er indlejret i attestationselementet men de anses ikke for værende viljestilkendegivelsesaktører.</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="Format" type="AttestationsformatType" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="Underskriftstidspunkt" type="xsd:dateTime" minOccurs="1" maxOccurs="1">
-			  <xs:annotation>
-				<xs:documentation>Underskriftstidspunkt er lig med genereringstidspunkt for signaturen</xs:documentation>
-			  </xs:annotation>
+<xs:element name="Attestation" type="AttestationType"/>
+<xs:complexType name="AttestationType">
+	<xs:annotation>
+		<xs:documentation>Hvis der er flere viljestilkendegivere oprettes een viljestilkendegivelseserklæring per viljestilkendegiver.
+Logikken om hvad der skal til for at man må foretage en handling baseret på et eller flere viljestilkendegivelser administreres lokalt. Det vil sige, at hvis det f.eks. kræves at begge forældre giver deres samtykke for at en organisation må udføre en handling på et barn, vil den fælles infrastruktur kunne levere information om status på de enkelte viljestilkendegivelseserklæringer og underliggende viljestilkendegivelsespakker, men det er organisationens ansvar at tolke den information - at begge nødvendige samtykker er givet for at kunne udføre den ønskede handling.
+En attestation kan i tillæg til viljestilkendegivers viljestilkendegivelse være afhængig af, at det registreres af en medarbejder eller hvis det er indgået i et andet system, kan der laves en attest i form af et systembevis. I disse tilfælde vil viljestilkendegiver stadig stå som attestator, men attestationsformatet vil være enten medarbejderattest eller systembevis. Information om det specifikke system eller medarbejder er indlejret i attestationselementet men de anses ikke for værende viljestilkendegivelsesaktører.</xs:documentation>
+	</xs:annotation>
+	<xs:sequence>
+		<xs:element name="Format" type="AttestationsformatType" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="Underskriftstidspunkt" type="xsd:dateTime" minOccurs="1" maxOccurs="1">
+		  <xs:annotation>
+			<xs:documentation>Underskriftstidspunkt er lig med genereringstidspunkt for signaturen</xs:documentation>
+		  </xs:annotation>
+		</xs:element>
+		
+		<xs:element name="ViljestilkendegiverID" type="xsd:anyURI" minOccurs="1" maxOccurs="1">
+		  <xs:annotation>
+			<xs:documentation>ID på den viljestilkendegivelsesaktør som har afgivet viljestilkendegivelse</xs:documentation>
+		  </xs:annotation>
+		</xs:element>
+		
+		<xs:choice>
+			<xs:element name="Systembevis" type="xsd:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Anvendes fx når it-system har indhentet accept i brugerflade ved klik på knap etc. </xs:documentation>
+				</xs:annotation>
 			</xs:element>
-			
-			<xs:element name="ViljestilkendegiverID" type="xsd:anyURI" minOccurs="1" maxOccurs="1">
-			  <xs:annotation>
-				<xs:documentation>ID på den viljestilkendegivelsesaktør som har afgivet viljestilkendegivelse</xs:documentation>
-			  </xs:annotation>
-			</xs:element>
-			
-			<xs:choice>
-				<xs:element name="Systembevis" type="xsd:string" minOccurs="0" maxOccurs="1">
+			<xs:element name="DigitalSignatur" type="xsd:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Digital underskrift fra viljestilkendegiver eller medarbejderattestator. Dette element er tomt hvis der er tale om en PDF med en analog underskrift eller et systembevis</xs:documentation>
+				</xs:annotation>
+			</xs:element>		
+				<xs:element name="MedarbejderAttestator" type="xsd:anyURI" minOccurs="0" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Anvendes fx når it-system har indhentet accept i brugerflade ved klik på knap etc. </xs:documentation>
+						<xs:documentation>Angives kun hvis det er en medarbejder, der attesterer (signerer) på vegne af en borger. Der angives ID på den medarbejder som afgiver digital signatur. </xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="DigitalSignatur" type="xsd:string" minOccurs="0" maxOccurs="1">
-					<xs:annotation>
-						<xs:documentation>Digital underskrift fra viljestilkendegiver eller medarbejderattestator. Dette element er tomt hvis der er tale om en PDF med en analog underskrift eller et systembevis</xs:documentation>
-					</xs:annotation>
-				</xs:element>		
-					<xs:element name="MedarbejderAttestator" type="xsd:anyURI" minOccurs="0" maxOccurs="1">
-						<xs:annotation>
-							<xs:documentation>Angives kun hvis det er en medarbejder, der attesterer (signerer) på vegne af en borger. Der angives ID på den medarbejder som afgiver digital signatur. </xs:documentation>
-						</xs:annotation>
-					</xs:element>
-						<xs:element name="Rekvireringsmetode" type="RekvireringsmetodeType" minOccurs="1" maxOccurs="1"/>
-			</xs:choice>
-		
-		<!--  OBS: Skema burde anvende nedenstående definition i stedet, men det skal først afklares skemateknisk.
-		<xs:element name="Signaturelement" type="ds:Signature" minOccurs="0" maxOccurs="1">
-		  <xs:annotation>
-			<xs:documentation>Dette element er tomt hvis der er tale om en analog signatur eller en PDF med en analog underskrift</xs:documentation>
-		  </xs:annotation>
-		</xs:element> -->
-		</xs:sequence>
-	</xs:complexType>	
+					<xs:element name="Rekvireringsmetode" type="RekvireringsmetodeType" minOccurs="1" maxOccurs="1"/>
+		</xs:choice>
+	
+	<!--  OBS: Skema burde anvende nedenstående definition i stedet, men det skal først afklares skemateknisk.
+    <xs:element name="Signaturelement" type="ds:Signature" minOccurs="0" maxOccurs="1">
+      <xs:annotation>
+        <xs:documentation>Dette element er tomt hvis der er tale om en analog signatur eller en PDF med en analog underskrift</xs:documentation>
+      </xs:annotation>
+    </xs:element> -->
+	</xs:sequence>
+</xs:complexType>	
 
 	<xs:simpleType name="AttestationsformatType">
 		<xs:restriction base="xs:string">
@@ -129,13 +129,6 @@
 		</xs:restriction>
 	</xs:simpleType>
 
-	<xs:element name="Body" type="BodyType"/>
-	<xs:complexType name="BodyType">
-		<xs:sequence>
-      	<xs:element name="Maskinlaesbartindhold" type="xsd:anyType" minOccurs="0" maxOccurs="1"/>
-		</xs:sequence>
-	</xs:complexType>
-
 	<xs:simpleType name="DokumentFormatType">
 		<xs:annotation>
 			<xs:documentation>I datamodellen hedder viljestilkendegivelsesdokumentformat blot "dokumentformat". DokumentformatType skal anvendes af det system, som skal læse BODY ,til at vide hvilken type objekt, der fremgår</xs:documentation>
@@ -170,11 +163,12 @@
 		</xs:restriction>
 	</xs:simpleType>
 
+
 	<xs:element name="ErklaeringBody" type="ErklaeringBodyType"/>
 	<xs:complexType name="ErklaeringBodyType">
 		<xs:sequence>
 			<xs:element name="ID" type="xsd:anyURI" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="Erklaeringsobjekt" type="ErklaeringsobjektType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Erklaeringsobjekt" type="ErklaeringsobjektType" minOccurs="1" maxOccurs="unbounded"/>
 			<xs:element name="BrugervendtPraesentation" type="xsd:base64Binary" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Her gemmes det objekt, som er præsenteret for brugeren ved indgåelse af viljestilkendegivelsen.</xs:documentation>
@@ -192,6 +186,7 @@
 			<xs:element name="Aktoer" type="ViljestilkendegivelsesaktoerType" minOccurs="1" maxOccurs="unbounded"/>
 			<xs:element name="Domaenekontekst" type="ViljestilkendegivelsesdomaenekontekstType" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="Erklaeringsmetadata" type="ViljestilkendegivelseserklaeringsmetadataType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Viljestilkendegivelsestype" type="ViljestilkendegivelsesType" minOccurs="1" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	
@@ -232,15 +227,6 @@
 		</xs:sequence>
 	</xs:complexType>
 
-	<xs:element name="Header" type="HeaderType"/>
-	<xs:complexType name="HeaderType">
-		<xs:sequence>
-			<xs:element name="Viljestilkendegivelsesskabelon" type="xsd:anyURI" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="Adgangspolitik" type="AdgangspolitikType" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="Viljestilkendegivelsesmetadata" type="ViljestilkendegivelsesmetadataType" minOccurs="1" maxOccurs="1"/>
-		</xs:sequence>
-	</xs:complexType>
-
 	<xs:element name="Identifikator" type="IdentifikatorType"/>
 	<xs:complexType name="IdentifikatorType">
 		<xs:sequence>
@@ -260,7 +246,7 @@ Eksempelvis: FORM-Online Opgavenøglen 2.19 eller KLE Online Marts 2022</xs:docu
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-
+	
 	<xs:element name="Maskinlaesbartindhold" type="MaskinlaesbartindholdType"/>
 	<xs:complexType name="MaskinlaesbartindholdType">
 		<xs:sequence>
@@ -309,15 +295,6 @@ Eksempelvis: FORM-Online Opgavenøglen 2.19 eller KLE Online Marts 2022</xs:docu
 		<xs:sequence>
 			<xs:element name="Titel" type="xsd:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="Identifikator" type="IdentifikatorType" minOccurs="1" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:element name="Viljestilkendegivelse" type="ViljestilkendegivelseType"/>
-	<xs:complexType name="ViljestilkendegivelseType">
-		<xs:sequence>
-			<xs:element name="ID" type="xsd:anyURI" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="Header" type="HeaderType" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="Body" type="BodyType" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -418,7 +395,6 @@ Eksempelvis: FORM-Online Opgavenøglen 2.19 eller KLE Online Marts 2022</xs:docu
 			<xs:element name="Attestation" type="AttestationType" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="ErklaeringHeader" type="ErklaeringHeaderType" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="ErklaeringBody" type="ErklaeringBodyType" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="Viljestilkendegivelse" type="ViljestilkendegivelseType" minOccurs="1" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -446,48 +422,6 @@ Eksempelvis: FORM-Online Opgavenøglen 2.19 eller KLE Online Marts 2022</xs:docu
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-
-	<xs:element name="Viljestilkendegivelsesmetadata" type="ViljestilkendegivelsesmetadataType"/>
-	<xs:complexType name="ViljestilkendegivelsesmetadataType">
-		<xs:annotation>
-			<xs:documentation>Under implementering kan viljestilkendegivleser grupperes, hvis metadata er ens. </xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="Status" type="ViljestilkendegivelsesstatusType" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="Titel" type="xsd:string" minOccurs="1" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>Sigende titel til viljestilkendegivelsesen. Titlen skal kunne anvendes i overbliksvisning for borger eller medarbejder.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="ErstattetAf" type="xsd:anyURI" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="GaeldendeFra" type="xsd:dateTime" minOccurs="1" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>Viljestilkendegivelsen træder typisk i kraft ved attesteringstidspunktet.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="GaeldendeTil" type="xsd:dateTime" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>GældendeTil skal kun udfyldes hvis der er angivet et udløbstidspunkt. Hvis Viljestilkendegivelsen tilbagekaldes eller lukkes angives GældendeTil som tidsstempel for dette.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="Noegleord" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Nøgleord for viljestilkendegivelsen, som er fra lokal eller fælles datamodel eller klassifikation med kontrolleret udfaldsrum. </xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="Viljestilkendegivelsestype" type="ViljestilkendegivelsesType" minOccurs="1" maxOccurs="1"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:simpleType name="ViljestilkendegivelsesstatusType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="oprettet"/>
-			<xs:enumeration value="gaeldende"/>
-			<xs:enumeration value="afvist"/>
-			<xs:enumeration value="tilbagekaldt"/>
-			<xs:enumeration value="udloebet"/>
-		</xs:restriction>
-	</xs:simpleType>
 
 	<xs:simpleType name="ViljestilkendegivelsesType">
 		<xs:annotation>
