@@ -34,7 +34,7 @@
 			<xs:enumeration value="opdater_attestation"/>
 			<xs:enumeration value="opdater_body"/>
 			<xs:enumeration value="opdater_header"/>
-      <xs:enumeration value="opdater_signatur"/>
+			<xs:enumeration value="opdater_signatur"/>
 			<xs:enumeration value="slet"/>
 		</xs:restriction>
 	</xs:simpleType>
@@ -108,16 +108,6 @@ En attestation kan i tillæg til viljestilkendegivers viljestilkendegivelse vær
 		</xs:restriction>
 	</xs:simpleType>
 
-	<xs:element name="Bemyndigelse" type="BemyndigelseType"/>
-	<xs:complexType name="BemyndigelseType">
-		<xs:annotation>
-			<xs:documentation>Bemyndigelsestype skal kun angives, hvis attestator er en aktør med rollen "stedfortrædende viljestilkendegiver", da den henviser til hvilken adkomst den stedfortrædende viljestilkendegiver har til at indgå viljestilkendegivelsen på vegne af viljestilkendegivelsessubjekt</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="Bemyndigelsestype" type="BemyndigelsesType" minOccurs="0" maxOccurs="1"/>
-		</xs:sequence>
-	</xs:complexType>
-
 	<xs:simpleType name="BemyndigelsesType">
 		<xs:annotation>
 			<xs:documentation>BemyndigelsesType angiver den adkomst den stedfortrædende viljestilkendegiver har til at afgive viljestilkendegivelse på vegne af viljestilkendegivelsessubjektet. Det kan f.eks. være fordi de har en fuldmagt og derved er fuldmagtshaver</xs:documentation>
@@ -147,10 +137,9 @@ En attestation kan i tillæg til viljestilkendegivers viljestilkendegivelse vær
 			2) "afventer signering" som er et viljestilkendegivelse er sendt til signering til en eller flere viljestilkendegivere, og er endnu ikke signeret. Signatur komponenten vil kun fungere på viljestilkendegivelser med denne status
 			3) "gaeldende" som er status på viljestilkendegivelse, når viljestilkendegiver har attesteret viljestilkendegivelsen. Status addresserer ikke hvorvidt viljestilkendegivelsen er juridisk gyldigt, da det er op til den ansvarlige viljestilkendegivelseforretningsansvarlig at sikre.
 			4) "afvist", som er når viljestilkendegiver har afvist at signere viljestilkendegivelsen
-			5) "erstattet" som er status når viljestilkendegivelsen er blevet erstattet af et nyt viljestilkendegivelse, f.eks. ved opdatering af gyldighedsperiode
-			6) "tilbagekaldt" er når viljestilkendegiver har tilbagekaldt viljestilkendegivelsen
-			7) "udloebet" er når viljestilkendegivelsens gyldighedsperiode er udløbet og derfor ikke længere gyldigt. Det er forretningssystemets ansvar at opdatere status fra gyldig til udløbet
-			8) "lukket" viljestilkendegivelsen er lukket af et forretningssystem da der ikke lænrere er behov for viljestilkendegivelse</xs:documentation>
+			5) "tilbagekaldt" er når viljestilkendegiver har tilbagekaldt viljestilkendegivelsen
+			6) "udloebet" er når viljestilkendegivelsens gyldighedsperiode er udløbet og derfor ikke længere gyldigt. Det er forretningssystemets ansvar at opdatere status fra gyldig til udløbet
+			7) "lukket" viljestilkendegivelsen er lukket af et forretningssystem da der ikke lænrere er behov for viljestilkendegivelse</xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="oprettet"/>
@@ -343,7 +332,16 @@ Eksempelvis: FORM-Online Opgavenøglen 2.19 eller KLE Online Marts 2022</xs:docu
 				<xs:element name="Organisationsmedlem" type="OrganisationsmedlemType" minOccurs="0" maxOccurs="1"/>
 				<xs:element name="Person" type="PersonType" minOccurs="0" maxOccurs="1"/>
 			</xs:choice>
-	 		<xs:element name="AttestererPaaVegneAf" type="ViljestilkendegivelsesaktoerType" minOccurs="0" maxOccurs="1"/>
+	 		<xs:element name="AttestererPaaVegneAf" type="xsd:anyURI" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>ID på den viljestilkendegivelsesaktør som der afgives viljestilkendegivelse på vegne af</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Bemyndigelsestype" type="BemyndigelsesType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Bemyndigelsestype skal kun angives, hvis attestator er en aktør med rollen "stedfortrædende viljestilkendegiver", da den henviser til hvilken adkomst den stedfortrædende viljestilkendegiver har til at indgå viljestilkendegivelsen på vegne af viljestilkendegivelsessubjekt</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
