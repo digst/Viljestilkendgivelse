@@ -1,4 +1,12 @@
 # Viljestilkendgivelse
+
+Skemaet er udarbejdet til opmærkning af samtykker og frabedelse, så de kan håndteres på tværs af relevante aktører og udstilles for den enkelte borger. 
+Skemaet er opdateret på baggrund af input fra den offentlige kommentering-
+Skemaet er tilgængeligt for afprøvning hos interesserede organisationer - mere info her: https://arkitektur.digst.dk/node/1219
+Yderligere baggrundsmateriale i zip-fil her i repositoriet
+
+
+OLD
 Skemaet er udarbejdet til opmærkning af samtykker og frabedelse, så de kan håndteres på tværs af relevante aktører og udstilles for den enkelte borger. 
 Skemaet er sendt i offentlig kommentering - mere info her: https://arkitektur.digst.dk/node/812
 Yderligere baggrundsmateriale i zip-fil her i repositoriet
